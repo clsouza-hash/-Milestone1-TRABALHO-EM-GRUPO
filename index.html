@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API de Produtos - Front-End</title>
+  <!-- ============================================================ -->
+  <!-- LINK PARA ARQUIVO CSS EXTERNO -->
+  <!-- ============================================================ -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- ============================================================ -->
+    <!-- CABEÇALHO -->
+    <!-- ============================================================ -->
+    <h1>API de Produtos</h1>
+    <p class="subtitle">
+      Sistema de gerenciamento de produtos em tempo real
+    </p>
+
+    <div class="info-box">
+      <strong>Status do Servidor:</strong>
+      <span id="statusServidor">Verificando conexao...</span>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: LISTAR TODOS OS PRODUTOS -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <h2>1 - Listar Todos os Produtos</h2>
+      <p class="section-description">
+        <span class="info-title">Endpoint:</span> GET /produtos | 
+        <span class="info-title">Parametros:</span> Nenhum | 
+        <span class="info-title">Status Esperado:</span> 200 OK
+      </p>
+      <button onclick="listarTodos()">Listar Todos</button>
+      <div id="resultadoListar" class="resultado resultado-oculto"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: FILTRAR POR CATEGORIA (req.query) -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <h2>2 - Filtrar por Categoria (req.query)</h2>
+      <p class="section-description">
+        <span class="info-title">Endpoint:</span> GET /produtos/filtrar?categoria=X | 
+        <span class="info-title">Parametro:</span> req.query | 
+        <span class="info-title">Status Esperado:</span> 200 OK
+      </p>
+      <div class="info-box info-box-small">
+        <strong>req.query:</strong> Captura parametros opcionais da URL como chave-valor (?categoria=Eletronicos).
+        Util para filtros, buscas e parametros opcionais.
+      </div>
+      <div class="input-group">
+        <select id="categoriaFiltro" class="select-flex" title="Selecione uma categoria para filtrar">
+          <option value="">-- Selecione uma categoria --</option>
+          <option value="Eletronicos">Eletronicos</option>
+          <option value="Moveis">Moveis</option>
+        </select>
+        <button onclick="filtrarPorCategoria()">Filtrar</button>
+      </div>
+      <div id="resultadoFiltrar" class="resultado resultado-oculto"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: BUSCAR POR ID (req.params) -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <h2>3 - Buscar por ID (req.params)</h2>
+      <p class="section-description">
+        <span class="info-title">Endpoint:</span> GET /produtos/:id | 
+        <span class="info-title">Parametro:</span> req.params | 
+        <span class="info-title">Status Esperado:</span> 200 OK ou 404 Not Found
+      </p>
+      <div class="info-box info-box-small">
+        <strong>req.params:</strong> Captura valores obrigatorios na rota (/produtos/:id a req.params.id).
+        Usado para identificadores especificos.
+      </div>
+      <div class="input-group">
+        <input 
+          type="number" 
+          id="idBusca" 
+          placeholder="Digite o ID (ex: 1, 2, 3, 4, 5)"
+          class="input-flex"
+        >
+        <button onclick="buscarPorId()">Buscar</button>
+      </div>
+      <div id="resultadoBuscar" class="resultado resultado-oculto"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: CADASTRAR NOVO PRODUTO (req.body) -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <h2>4 - Cadastrar Novo Produto (req.body)</h2>
+      <p class="section-description">
+        <span class="info-title">Endpoint:</span> POST /produtos | 
+        <span class="info-title">Parametro:</span> req.body | 
+        <span class="info-title">Status Esperado:</span> 201 Created
+      </p>
+      <div class="info-box info-box-small">
+        <strong>req.body:</strong> Captura dados enviados no corpo da requisicao (JSON do formulario).
+        Requer middleware express.json() para funcionar.
+      </div>
+      <div class="formulario-grid">
+        <input 
+          type="text" 
+          id="nomeProduto" 
+          placeholder="Nome do Produto" 
+          required
+        >
+        <select id="categoriaProduto" title="Selecione a categoria do produto" required>
+          <option value="">-- Selecione categoria --</option>
+          <option value="Eletronicos">Eletronicos</option>
+          <option value="Moveis">Moveis</option>
+          <option value="Acessorios">Acessorios</option>
+        </select>
+        <input 
+          type="number" 
+          id="precoProduto" 
+          placeholder="Preco (ex: 199.99)" 
+          step="0.01" 
+          required
+        >
+        <input 
+          type="number" 
+          id="estoqueProduto" 
+          placeholder="Quantidade em Estoque" 
+          required
+        >
+      </div>
+      <button onclick="cadastrarProduto()">Cadastrar Produto</button>
+      <div id="resultadoCadastro" class="resultado resultado-oculto"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: REMOVER PRODUTO (DELETE req.params) -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <h2>5 - Remover Produto (DELETE)</h2>
+      <p class="section-description">
+        <span class="info-title">Endpoint:</span> DELETE /produtos/:id | 
+        <span class="info-title">Parametro:</span> req.params | 
+        <span class="info-title">Status Esperado:</span> 200 OK ou 404 Not Found
+      </p>
+      <div class="input-group">
+        <input 
+          type="number" 
+          id="idRemover" 
+          placeholder="Digite o ID do produto a remover"
+          class="input-flex"
+        >
+        <button class="delete" onclick="removerProduto()">Remover</button>
+      </div>
+      <div id="resultadoRemover" class="resultado resultado-oculto"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- LINK PARA ARQUIVO JAVASCRIPT EXTERNO -->
+  <!-- ============================================================ -->
+  <script src="script.js"></script>
+</body>
+</html>
