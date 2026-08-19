@@ -61,8 +61,13 @@ app.get('/produtos/filtrar', (req, res) => {
     return res.status(200).json(produtos);
   }
 
+  const normalizarCategoria = valor => valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
   const produtosFiltrados = produtos.filter(
-    produto => produto.categoria.toLowerCase() === categoria.toLowerCase()
+    produto => normalizarCategoria(produto.categoria) === normalizarCategoria(categoria)
   );
 
   res.status(200).json(produtosFiltrados);
@@ -80,7 +85,7 @@ app.get('/produtos/:id', (req, res) => {
 });
 
 app.post('/produtos', (req, res) => {
-const { nome, categoria, preco, estoque } = req.body;
+  const { nome, categoria, preco, estoque } = req.body;
 
   if (!nome || !categoria || !preco || estoque === undefined) {
     return res.status(400).json({ erro: 'Campos obrigatórios faltando.' });
